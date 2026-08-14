@@ -21,6 +21,9 @@ asynSetOption("$(CAEN_PORT)", -1, "crtscts", "N")
 asynSetOption("$(CAEN_PORT)", -1, "ixon",    "Y")
 asynSetOption("$(CAEN_PORT)", -1, "ixoff",   "Y")
 
-dbLoadTemplate("db/music_hv.substitutions", "P=$(MUSIC_PREFIX),PORT=$(CAEN_PORT),BD=$(CAEN_BD),VMAX=$(HV_V_SET_MAX),IMAX=$(HV_I_SET_MAX)")
+# dbLoadTemplate("db/music_hv.substitutions", "P=$(MUSIC_PREFIX),PORT=$(CAEN_PORT),BD=$(CAEN_BD),VMAX=$(HV_V_SET_MAX),IMAX=$(HV_I_SET_MAX)")
+# dbLoadTemplate("db/music_hv.substitutions", "P=$(MUSIC_PREFIX),PORT=$(CAEN_PORT),BD=$(CAEN_BD),VMAX=$(HV_V_SET_MAX),IMAX=$(HV_I_SET_MAX),RUP_DEFAULT=$(HV_RAMP_UP_DEFAULT),RDW_DEFAULT=$(HV_RAMP_DOWN_DEFAULT)")
+dbLoadTemplate("db/music_hv.substitutions", "P=$(MUSIC_PREFIX),PORT=$(CAEN_PORT),BD=$(CAEN_BD),VMAX=$(HV_V_SET_MAX),IMAX=$(HV_I_SET_MAX),RUP_DEFAULT=$(HV_RAMP_UP_DEFAULT=5),RDW_DEFAULT=$(HV_RAMP_DOWN_DEFAULT=10)")
+
 
 iocInit
