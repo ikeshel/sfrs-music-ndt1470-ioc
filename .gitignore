@@ -1,0 +1,18 @@
+# EPICS generated build output
+**/O.*
+/bin/
+/db/
+/dbd/
+/lib/
+/include/
+/html/
+/cfg/
+/iocBoot/*/envPaths
+
+# Temporary files
+*.log
+*.swp
+*~
+core
+core.*
+

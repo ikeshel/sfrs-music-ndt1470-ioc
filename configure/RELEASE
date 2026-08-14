@@ -1,0 +1,10 @@
+# Standalone IOC dependencies.
+#
+# These defaults match a common per-user EPICS installation. Edit them here,
+# export them in the environment, or override them on the make command line.
+
+ASYN = $(HOME)/EPICS/support/asyn
+STREAM = $(HOME)/EPICS/support/StreamDevice
+EPICS_BASE = $(HOME)/EPICS/base-7.0.10
+
+

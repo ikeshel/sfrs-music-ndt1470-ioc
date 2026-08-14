@@ -1,0 +1,71 @@
+# Monitoring and setpoint control for one MUSIC field cage.
+#
+# P      EPICS prefix, e.g. SFRS:FHF1:MUSIC1:
+# FC     field-cage number, 1..3
+# PORT   asyn port name
+# BD     two-digit CAEN local-bus address
+# CH     CAEN channel, 0..2
+# VMAX   maximum voltage accepted through EPICS, volts
+# IMAX   maximum current limit accepted through EPICS, microamperes
+
+record(ao, "$(P)FC$(FC):HV_V_SET")
+{
+    field(DESC, "HV voltage setpoint")
+    field(DTYP, "stream")
+    field(OUT,  "@caen_ndt1470.proto setVSet($(BD),$(CH)) $(PORT)")
+    field(SCAN, "Passive")
+    field(EGU,  "V")
+    field(PREC, "1")
+    field(DRVL, "0")
+    field(DRVH, "$(VMAX)")
+    field(LOPR, "0")
+    field(HOPR, "$(VMAX)")
+    field(PINI, "NO")
+}
+
+record(ai, "$(P)FC$(FC):HV_V_RBV")
+{
+    field(DESC, "Measured HV voltage")
+    field(DTYP, "stream")
+    field(INP,  "@caen_ndt1470.proto getVMon($(BD),$(CH)) $(PORT)")
+    field(SCAN, "1 second")
+    field(EGU,  "V")
+    field(PREC, "1")
+    field(HOPR, "8100")
+    field(LOPR, "-8100")
+}
+
+record(ao, "$(P)FC$(FC):HV_I_SET")
+{
+    field(DESC, "HV current-limit setpoint")
+    field(DTYP, "stream")
+    field(OUT,  "@caen_ndt1470.proto setISet($(BD),$(CH)) $(PORT)")
+    field(SCAN, "Passive")
+    field(EGU,  "uA")
+    field(PREC, "2")
+    field(DRVL, "0")
+    field(DRVH, "$(IMAX)")
+    field(LOPR, "0")
+    field(HOPR, "$(IMAX)")
+    field(PINI, "NO")
+}
+
+record(ai, "$(P)FC$(FC):HV_I_RBV")
+{
+    field(DESC, "Measured HV current")
+    field(DTYP, "stream")
+    field(INP,  "@caen_ndt1470.proto getIMon($(BD),$(CH)) $(PORT)")
+    field(SCAN, "1 second")
+    field(EGU,  "uA")
+    field(PREC, "3")
+    field(HOPR, "3000")
+    field(LOPR, "0")
+}
+
+record(longin, "$(P)FC$(FC):HV_STATE")
+{
+    field(DESC, "Raw CAEN status bitmask")
+    field(DTYP, "stream")
+    field(INP,  "@caen_ndt1470.proto getStatus($(BD),$(CH)) $(PORT)")
+    field(SCAN, "1 second")
+}
