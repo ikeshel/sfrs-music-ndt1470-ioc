@@ -11,7 +11,8 @@ ioc_arch=${EPICS_HOST_ARCH:-linux-x86_64}
 ioc_binary="$ioc_root/bin/$ioc_arch/musicNdt1470"
 ioc_boot="$ioc_root/iocBoot/iocmusicNdt1470"
 
-export EPICS_CAS_SERVER_PORT="${EPICS_CAS_SERVER_PORT:-5066}"
+# ss -lntup | grep ':5064'
+export EPICS_CAS_SERVER_PORT="${EPICS_CAS_SERVER_PORT:-5064}"
 
 # ---------------------------------------------------------------------------
 # Select the PV location from the computer hostname
