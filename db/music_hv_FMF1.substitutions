@@ -9,7 +9,7 @@ file "db/music_hv.template"
     }
 
     {
-        FC1, 0
-        FC2, 1
+        1, 0
+        2, 1
     }
 }
