@@ -3,13 +3,7 @@
 #
 file "db/music_hv.template"
 {
-     pattern
-    {
-        FC,  CH
-    }
-
-    {
-        1, 0
-        2, 1
-    }
+    pattern { FC, CH }
+            { 1,  0  }
+            { 2,  1  }
 }
