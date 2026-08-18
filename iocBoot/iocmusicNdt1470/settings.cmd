@@ -1,14 +1,15 @@
-# FHF1 MUSIC1 installation settings
+#
+# i.keshelashvili@gsi.de
+#
+# FMF1 or FHF1, MUSIC1 installation settings
 
-epicsEnvSet("MUSIC_PREFIX", "SFRS:FHF1:MUSIC1:")
+epicsEnvSet("MUSIC_PREFIX", "SFRS:$(PV_LOCATION):MUSIC1:")
 epicsEnvSet("CAEN_PORT",    "MUSIC_HV")
-epicsEnvSet("CAEN_DEVICE",  "/dev/ttyACM0")
 epicsEnvSet("CAEN_BD",      "00")
 epicsEnvSet("CAEN_BAUD",    "9600")
 
-# EPICS CAS server port. This is the port that the IOC will listen on for incoming CA connections.
-epicsEnvSet("EPICS_CAS_SERVER_PORT", "5066")
-
+# epicsEnvSet("CAEN_DEVICE",  "/dev/ttyACM0")
+# epicsEnvSet("CAEN_DEVICE",  "/dev/serial/by-id/usb-CAEN_SPA_NIM_Desktop_HV_Power_Supply-if00")
 
 #########
 # EPICS write limits. Set these to the approved MUSIC1 operating envelope.
