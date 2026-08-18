@@ -1,0 +1,15 @@
+#
+# i.keshelashvili@gsi.de
+#
+file "db/music_hv.template"
+{
+     pattern
+    {
+        FC,  CH
+    }
+
+    {
+        FC1, 0
+        FC2, 1
+    }
+}

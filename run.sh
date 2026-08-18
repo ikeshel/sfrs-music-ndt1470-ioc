@@ -1,5 +1,9 @@
 #!/usr/bin/env bash
 
+#
+# i.keshelashvili@gsi.de
+#
+
 set -euo pipefail
 
 ioc_root=$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)
@@ -17,19 +21,16 @@ ioc_hostname=$(hostname -s)
 ioc_hostname_lower=${ioc_hostname,,}
 
 case "$ioc_hostname_lower" in
-    x86l-261)
-        pv_location="FHF1"
-        ;;
 
     x86l-260)
         pv_location="FMF1"
+        substitutions_file="db/music_hv_FMF1.substitutions"
         ;;
 
-    # Add additional IOC computers here:
-    #
-    # dtlpc019)
-    #     pv_location="FMF1"
-    #     ;;
+    x86l-261)
+        pv_location="FHF1"
+        substitutions_file="db/music_hv_FHF1.substitutions"
+        ;;
 
     *)
         echo "Unknown IOC computer: $ioc_hostname" >&2
@@ -40,6 +41,8 @@ esac
 
 export IOC_HOSTNAME="$ioc_hostname"
 export PV_LOCATION="$pv_location"
+export MUSIC_SUBSTITUTIONS="$substitutions_file"
+
 
 # ---------------------------------------------------------------------------
 # Locate the CAEN USB device using its persistent device name
@@ -96,6 +99,7 @@ echo "  PV prefix:    SFRS:${PV_LOCATION}:MUSIC1:"
 echo "  CAEN device:  $CAEN_DEVICE"
 echo "  CA server:    $EPICS_CAS_SERVER_PORT"
 echo "  Architecture: $ioc_arch"
+echo "  Configuration: $MUSIC_SUBSTITUTIONS"
 
 cd "$ioc_boot"
 exec "$ioc_binary" st.cmd

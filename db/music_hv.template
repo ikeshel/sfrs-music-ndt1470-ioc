@@ -1,5 +1,7 @@
 # Monitoring and setpoint control for one MUSIC field cage.
 #
+# i.keshelashvili@gsi.de
+#
 # P      EPICS prefix, e.g. SFRS:FHF1:MUSIC1:
 # FC     field-cage number, 1..3
 # PORT   asyn port name

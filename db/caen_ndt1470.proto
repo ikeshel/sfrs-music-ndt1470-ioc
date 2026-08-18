@@ -1,5 +1,7 @@
 # CAEN NDT1470 ASCII protocol for StreamDevice
 #
+# i.keshelashvili@gsi.de
+#
 # Protocol arguments:
 #   \$1 = two-digit local-bus address, e.g. 00
 #   \$2 = CAEN channel number, 0..3

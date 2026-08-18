@@ -1,5 +1,7 @@
 # Standalone IOC dependencies.
 #
+# i.keshelashvili@gsi.de
+#
 # These defaults match a common per-user EPICS installation. Edit them here,
 # export them in the environment, or override them on the make command line.
 
