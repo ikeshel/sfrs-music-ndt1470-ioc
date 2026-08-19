@@ -64,7 +64,7 @@ record(ai, "$(P)FC$(FC):HV_V_RBV")
     field(LOPR, "-1")
     field(LOW,  "0")
     field(LOLO,  "0")
-    field(HIGH, "$(VMAX)*0.9")
+    field(HIGH, "90")
     field(HIHI, "$(VMAX)")
 }
 
@@ -95,7 +95,7 @@ record(ai, "$(P)FC$(FC):HV_I_RBV")
     field(LOPR, "-1")
     field(LOW,  "0")
     field(LOLO,  "0")
-    field(HIGH, "0.9*$(IMAX)")
+    field(HIGH, "0.2")
     field(HIHI, "$(IMAX)")
 }
 
