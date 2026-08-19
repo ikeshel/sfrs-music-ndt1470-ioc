@@ -22,11 +22,20 @@ record(bo, "$(P)FC$(FC):HV_ENABLE")
     # Never automatically energize HV when the IOC starts.
     field(PINI, "NO")
 }
+alias ($(P)FC$(FC):HV_ENABLE, $(P)FC$(FC):HV_ENABL)
+alias ($(P)FC$(FC):HV_ENABLE, $(P)FC$(FC):HV_ON_OFF)
 alias ($(P)FC$(FC):HV_ENABLE, $(P)FC$(FC):HV_ON)
 alias ($(P)FC$(FC):HV_ENABLE, $(P)FC$(FC):HV_OFF)
-alias ($(P)FC$(FC):HV_ENABLE, $(P)FC$(FC):HV_ON_OFF)
-alias ($(P)FC$(FC):HV_ENABLE, $(P)FC$(FC):HV_ENABL)
 
+record(longin, "$(P)FC$(FC):HV_STATUS")
+{
+    field(DESC, "Raw CAEN status bitmask")
+    field(DTYP, "stream")
+    field(INP,  "@caen_ndt1470.proto getStatus($(BD),$(CH)) $(PORT)")
+    field(SCAN, "1 second")
+}
+alias ($(P)FC$(FC):HV_STATUS, $(P)FC$(FC):HV_STATE)
+alias ($(P)FC$(FC):HV_STATUS, $(P)FC$(FC):HV_STAT)
 
 record(ao, "$(P)FC$(FC):HV_V_SET")
 {
@@ -52,23 +61,27 @@ record(ai, "$(P)FC$(FC):HV_V_RBV")
     field(EGU,  "V")
     field(PREC, "1")
     field(HOPR, "$(VMAX)")
-    field(LOPR, "0")
+    field(LOPR, "-1")
+    field(LOW,  "0")
+    field(LOLO,  "0")
+    field(HIGH, "0.9*$(VMAX)")
+    field(HIHI, "$(VMAX)")
 }
 
-# record(ao, "$(P)FC$(FC):HV_I_SET")
-# {
-#     field(DESC, "HV current-limit setpoint")
-#     field(DTYP, "stream")
-#     field(OUT,  "@caen_ndt1470.proto setISet($(BD),$(CH)) $(PORT)")
-#     field(SCAN, "Passive")
-#     field(EGU,  "uA")
-#     field(PREC, "2")
-#     field(DRVL, "0")
-#     field(DRVH, "$(IMAX)")
-#     field(LOPR, "0")
-#     field(HOPR, "$(IMAX)")
-#     field(PINI, "NO")
-# }
+record(ao, "$(P)FC$(FC):HV_I_SET")
+{
+    field(DESC, "HV current-limit setpoint")
+    field(DTYP, "stream")
+    field(OUT,  "@caen_ndt1470.proto setISet($(BD),$(CH)) $(PORT)")
+    field(SCAN, "Passive")
+    field(EGU,  "uA")
+    field(PREC, "2")
+    field(DRVL, "0")
+    field(DRVH, "$(IMAX)")
+    field(LOPR, "0")
+    field(HOPR, "$(IMAX)")
+    field(PINI, "NO")
+}
 
 record(ai, "$(P)FC$(FC):HV_I_RBV")
 {
@@ -79,18 +92,12 @@ record(ai, "$(P)FC$(FC):HV_I_RBV")
     field(EGU,  "uA")
     field(PREC, "3")
     field(HOPR, "$(IMAX)")
-    field(LOPR, "0")
+    field(LOPR, "-1")
+    field(LOW,  "0")
+    field(LOLO,  "0")
+    field(HIGH, "0.9*$(IMAX)")
+    field(HIHI, "$(IMAX)")
 }
-
-record(longin, "$(P)FC$(FC):HV_STATUS")
-{
-    field(DESC, "Raw CAEN status bitmask")
-    field(DTYP, "stream")
-    field(INP,  "@caen_ndt1470.proto getStatus($(BD),$(CH)) $(PORT)")
-    field(SCAN, "1 second")
-}
-alias ($(P)FC$(FC):HV_STATUS, $(P)FC$(FC):HV_STATE)
-alias ($(P)FC$(FC):HV_STATUS, $(P)FC$(FC):HV_STAT)
 
 record(ao, "$(P)FC$(FC):HV_RAMP_UP_SET")
 {
