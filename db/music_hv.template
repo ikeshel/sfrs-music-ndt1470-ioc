@@ -51,24 +51,24 @@ record(ai, "$(P)FC$(FC):HV_V_RBV")
     field(SCAN, "1 second")
     field(EGU,  "V")
     field(PREC, "1")
-    field(HOPR, "8100")
-    field(LOPR, "-8100")
+    field(HOPR, "$(VMAX)")
+    field(LOPR, "0")
 }
 
-record(ao, "$(P)FC$(FC):HV_I_SET")
-{
-    field(DESC, "HV current-limit setpoint")
-    field(DTYP, "stream")
-    field(OUT,  "@caen_ndt1470.proto setISet($(BD),$(CH)) $(PORT)")
-    field(SCAN, "Passive")
-    field(EGU,  "uA")
-    field(PREC, "2")
-    field(DRVL, "0")
-    field(DRVH, "$(IMAX)")
-    field(LOPR, "0")
-    field(HOPR, "$(IMAX)")
-    field(PINI, "NO")
-}
+# record(ao, "$(P)FC$(FC):HV_I_SET")
+# {
+#     field(DESC, "HV current-limit setpoint")
+#     field(DTYP, "stream")
+#     field(OUT,  "@caen_ndt1470.proto setISet($(BD),$(CH)) $(PORT)")
+#     field(SCAN, "Passive")
+#     field(EGU,  "uA")
+#     field(PREC, "2")
+#     field(DRVL, "0")
+#     field(DRVH, "$(IMAX)")
+#     field(LOPR, "0")
+#     field(HOPR, "$(IMAX)")
+#     field(PINI, "NO")
+# }
 
 record(ai, "$(P)FC$(FC):HV_I_RBV")
 {
@@ -78,17 +78,19 @@ record(ai, "$(P)FC$(FC):HV_I_RBV")
     field(SCAN, "1 second")
     field(EGU,  "uA")
     field(PREC, "3")
-    field(HOPR, "3000")
+    field(HOPR, "$(IMAX)")
     field(LOPR, "0")
 }
 
-record(longin, "$(P)FC$(FC):HV_STATE")
+record(longin, "$(P)FC$(FC):HV_STATUS")
 {
     field(DESC, "Raw CAEN status bitmask")
     field(DTYP, "stream")
     field(INP,  "@caen_ndt1470.proto getStatus($(BD),$(CH)) $(PORT)")
     field(SCAN, "1 second")
 }
+alias ($(P)FC$(FC):HV_STATUS, $(P)FC$(FC):HV_STATE)
+alias ($(P)FC$(FC):HV_STATUS, $(P)FC$(FC):HV_STAT)
 
 record(ao, "$(P)FC$(FC):HV_RAMP_UP_SET")
 {

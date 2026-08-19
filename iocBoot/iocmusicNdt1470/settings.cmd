@@ -13,8 +13,8 @@ epicsEnvSet("CAEN_BAUD",    "9600")
 
 #########
 # EPICS write limits. Set these to the approved MUSIC1 operating envelope.
-epicsEnvSet("HV_V_SET_MAX",  "3000") # Voltage setpoint limit in volts
-epicsEnvSet("HV_I_SET_MAX",  "300")  # Current setpoint limit in microamps
+epicsEnvSet("HV_V_SET_MAX",  "100") # Voltage setpoint limit in volts
+epicsEnvSet("HV_I_SET_MAX",  "5")    # Current setpoint limit in microamps
 
 # EPICS default ramp rates. These are the default values that will be used when the IOC starts up.
 epicsEnvSet("HV_RAMP_UP_DEFAULT",   "1") # Ramp-up speed in V/s
