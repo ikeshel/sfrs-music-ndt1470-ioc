@@ -112,7 +112,7 @@ record(ao, "$(P)FC$(FC):HV_RAMP_UP_SET")
     field(LOPR, "1")
     field(HOPR, "500")
 
-    field(VAL,  "$(RUP_DEFAULT=1)")
+    field(VAL,  "$(RUP_DEFAULT=100)")
     field(PINI, "YES")
 }
 
@@ -129,6 +129,6 @@ record(ao, "$(P)FC$(FC):HV_RAMP_DOWN_SET")
     field(LOPR, "1")
     field(HOPR, "500")
 
-    field(VAL,  "$(RDW_DEFAULT=2)")
+    field(VAL,  "$(RDW_DEFAULT=200)")
     field(PINI, "YES")
 }
