@@ -260,3 +260,40 @@ Expected ramp values are 400 and 500 with no alarms, and `DRVH` is 4500.
 A displayed default alone does not prove that the hardware accepted the write:
 check the alarms and module display. Existing USB disconnections or protocol
 reply errors must be resolved before hardware application can be confirmed.
+
+## NHV display ranges
+
+Readbacks and setpoints use positive magnitudes: voltage 0–4500 V and
+current 0–80 µA. Readback `LOPR` is zero, matching the setpoint range.
+The current `HIGH` reference is 75 µA and `HIHI` is 80 µA; voltage references
+remain 4250 V and 4500 V. EPICS threshold severities remain disabled; these
+changes do not introduce new PV alarms or change hardware trip settings.
+
+The shared Phoebus display lives in the sibling `sfrs-dcs-epics` repository,
+under both `CSS_examples/Main Concept/MUSIC` and
+`CSS_examples/New Concept/MUSIC`. Its NHV meter settings use display limits
+from the PV and explicit visual bands: no low-current/low-voltage warning
+band, upper voltage bands at 4250/4500 V, and upper current bands at 75/80 µA.
+The 75 µA band is an early visual warning, not a hardware current limit.
+Without those widget settings, disabled EPICS alarms supply no usable alarm
+metadata and Phoebus falls back to generic 10/20/80/90 bands. The PHV display
+configuration is unchanged.
+
+The NHV display selects `MUSIC_NHV.plt`, with linear, fixed axes of 0–4500 V
+and 0–80 µA. This prevents a constant setpoint from producing a very narrow
+voltage axis and makes zero current visible (a logarithmic axis cannot show
+zero). The plot contains both voltage setpoint and voltage readback; a nonzero
+setpoint while the channel is OFF is not a measured output voltage.
+
+Deploy both the IOC database and the shared Phoebus display changes. Build and
+restart the IOC, then reopen the display to reload its widgets and PV metadata.
+For example, verify the deployed IOC metadata without writing to hardware:
+
+```bash
+caget -d DBR_CTRL_DOUBLE SFRS:FHF1:MUSIC1:FC1:NHV:V_RBV
+caget -d DBR_CTRL_DOUBLE SFRS:FHF1:MUSIC1:FC1:NHV:I_RBV
+```
+
+The display limits should be 0/4500 and 0/80 respectively. Alarm limits can
+remain NaN because threshold alarm severities are disabled; the NHV gauge
+uses its explicit visual bands instead.

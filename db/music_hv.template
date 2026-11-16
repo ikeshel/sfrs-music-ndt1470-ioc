@@ -9,6 +9,9 @@
 # CH     CAEN channel, 0..2
 # VMAX   maximum voltage accepted through EPICS, volts
 # IMAX   maximum current limit accepted through EPICS, microamperes
+# Readbacks are positive magnitudes even with physical negative polarity.
+# LOW/LOLO/HIGH/HIHI do not enable EPICS alarms without severity fields.
+# Phoebus NHV display bands are configured separately in the shared GUI.
 
 record(bo, "$(P)FC$(FC):NHV:ENABLE")
 {
@@ -55,7 +58,7 @@ record(ai, "$(P)FC$(FC):NHV:V_RBV")
     field(EGU,  "V")
     field(PREC, "1")
     field(HOPR, "$(VMAX)")
-    field(LOPR, "-1")
+    field(LOPR, "0")
     field(LOW,  "0")
     field(LOLO,  "0")
     field(HIGH, "4250")
@@ -86,10 +89,10 @@ record(ai, "$(P)FC$(FC):NHV:I_RBV")
     field(EGU,  "uA")
     field(PREC, "3")
     field(HOPR, "$(IMAX)")
-    field(LOPR, "-1")
+    field(LOPR, "0")
     field(LOW,  "0")
     field(LOLO,  "0")
-    field(HIGH, "80")
+    field(HIGH, "75")
     field(HIHI, "$(IMAX)")
 }
 

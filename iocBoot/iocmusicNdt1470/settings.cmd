@@ -1,7 +1,7 @@
 #
 # i.keshelashvili@gsi.de
 #
-# FMF1 or FHF1, MUSIC1 installation settings
+# FMF1 or FHF1, Negative HV MUSIC1 installation settings
 
 epicsEnvSet("MUSIC_PREFIX", "SFRS:$(PV_LOCATION):MUSIC1:")
 epicsEnvSet("CAEN_PORT",    "MUSIC_HV")
