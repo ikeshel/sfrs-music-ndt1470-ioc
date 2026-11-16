@@ -16,20 +16,19 @@ The IOC monitors the first three CAEN channels:
 
 Each field cage provides:
 
-- `HV_V_SET`: writable voltage setpoint (`VSET`), volts
-- `HV_V_RBV`: measured voltage (`VMON`), volts
-- `HV_I_SET`: writable current-limit setpoint (`ISET`), microamperes
-- `HV_I_RBV`: measured current (`IMON`), microamperes
-- `HV_STATE`: raw decimal CAEN status bitmask
+- `NHV:V_SET`: writable voltage setpoint (`VSET`), volts
+- `NHV:V_RBV`: measured voltage (`VMON`), volts
+- `NHV:I_SET`: writable current-limit setpoint (`ISET`), microamperes
+- `NHV:I_RBV`: measured current (`IMON`), microamperes
+- `NHV:STATUS`: raw decimal CAEN status bitmask
 
-`HV_V_SET` and `HV_I_SET` are StreamDevice `ao` records. At IOC startup they
+`NHV:V_SET` and `NHV:I_SET` are StreamDevice `ao` records. At IOC startup they
 read the existing values from the hardware, so startup does not overwrite the
 module with zero. A successful write is followed by a hardware query that
 updates the record with the value accepted by the module.
 
-**Safety:** writing `HV_V_SET` while a channel is ON makes that channel ramp
-toward the new voltage. This IOC intentionally does not provide channel ON/OFF
-controls. Keep the hardware interlock, `MAXV`, current limit and approved
+**Safety:** writing `NHV:V_SET` while a channel is ON makes that channel ramp
+toward the new voltage. The IOC provides `NHV:ENABLE` (0=OFF, 1=ON). Keep the hardware interlock, `MAXV`, current limit and approved
 operating procedure in place.
 
 ## Requirements
@@ -90,12 +89,14 @@ epicsEnvSet("CAEN_PORT",    "MUSIC_HV")
 epicsEnvSet("CAEN_DEVICE",  "/dev/ttyACM0")
 epicsEnvSet("CAEN_BD",      "00")
 epicsEnvSet("CAEN_BAUD",    "9600")
-epicsEnvSet("HV_V_SET_MAX",  "3000")
-epicsEnvSet("HV_I_SET_MAX",  "300")
+epicsEnvSet("HV_V_SET_MAX",  "4500")
+epicsEnvSet("HV_I_SET_MAX",  "80")
+epicsEnvSet("HV_RAMP_UP_DEFAULT",   "400")
+epicsEnvSet("HV_RAMP_DOWN_DEFAULT", "500")
 ```
 
 `HV_V_SET_MAX` and `HV_I_SET_MAX` are the EPICS write limits applied to every
-field cage. The supplied conservative defaults are 3000 V and 300 µA. Change
+field cage. The configured limits are 4500 V and 80 µA. Change
 them only to the approved MUSIC1 limits. These software limits complement, but
 do not replace, the module's hardware `MAXV` and interlocks.
 
@@ -140,11 +141,11 @@ In another terminal:
 
 ```bash
 for fc in 1 2 3; do
-  caget "SFRS:FHF1:MUSIC1:FC${fc}:HV_V_SET" \
-        "SFRS:FHF1:MUSIC1:FC${fc}:HV_V_RBV" \
-        "SFRS:FHF1:MUSIC1:FC${fc}:HV_I_SET" \
-        "SFRS:FHF1:MUSIC1:FC${fc}:HV_I_RBV" \
-        "SFRS:FHF1:MUSIC1:FC${fc}:HV_STATE"
+  caget "SFRS:FHF1:MUSIC1:FC${fc}:NHV:V_SET" \
+        "SFRS:FHF1:MUSIC1:FC${fc}:NHV:V_RBV" \
+        "SFRS:FHF1:MUSIC1:FC${fc}:NHV:I_SET" \
+        "SFRS:FHF1:MUSIC1:FC${fc}:NHV:I_RBV" \
+        "SFRS:FHF1:MUSIC1:FC${fc}:NHV:STATUS"
 done
 ```
 
@@ -154,8 +155,8 @@ After confirming the field-cage wiring, polarity, current limit, interlock and
 channel mapping, write an approved value with:
 
 ```bash
-caput SFRS:FHF1:MUSIC1:FC1:HV_V_SET VALUE_IN_VOLTS
-caput SFRS:FHF1:MUSIC1:FC1:HV_I_SET VALUE_IN_MICROAMPERES
+caput SFRS:FHF1:MUSIC1:FC1:NHV:V_SET VALUE_IN_VOLTS
+caput SFRS:FHF1:MUSIC1:FC1:NHV:I_SET VALUE_IN_MICROAMPERES
 ```
 
 The IOC sends these commands and checks the CAEN acknowledgement:
@@ -170,10 +171,10 @@ out-of-range response or LOCAL-mode rejection puts the EPICS record into an
 alarm state. Check it after each write:
 
 ```bash
-caget SFRS:FHF1:MUSIC1:FC1:HV_V_SET.STAT \
-      SFRS:FHF1:MUSIC1:FC1:HV_V_SET.SEVR \
-      SFRS:FHF1:MUSIC1:FC1:HV_I_SET.STAT \
-      SFRS:FHF1:MUSIC1:FC1:HV_I_SET.SEVR
+caget SFRS:FHF1:MUSIC1:FC1:NHV:V_SET.STAT \
+      SFRS:FHF1:MUSIC1:FC1:NHV:V_SET.SEVR \
+      SFRS:FHF1:MUSIC1:FC1:NHV:I_SET.STAT \
+      SFRS:FHF1:MUSIC1:FC1:NHV:I_SET.SEVR
 ```
 
 For serial diagnostics, add these lines in `st.cmd` immediately before
@@ -189,7 +190,7 @@ baud rate `9600`, and that no Python process still owns the port.
 
 ## Status bits
 
-`HV_STATE` preserves the raw CAEN bitmask:
+`NHV:STATUS` preserves the raw CAEN bitmask:
 
 | Bit | Meaning |
 |---:|---|
@@ -207,3 +208,55 @@ baud rate `9600`, and that no Python process still owns the port.
 | 11 | Kill |
 | 12 | Interlock |
 | 13 | Calibration error |
+
+## Polarity naming migration
+
+Canonical PVs use `FC<n>:NHV:<parameter>`; every record also has a
+`FC<n>:NEGATIVE:<parameter>` alias. Parameters are `V_SET`, `V_RBV`,
+`I_SET`, `I_RBV`, `RAMP_UP_SET`, `RAMP_DOWN_SET`, `ENABLE` and `STATUS`.
+For example, `SFRS:FHF1:MUSIC1:FC1:NEGATIVE:V_RBV` is the same record
+as `SFRS:FHF1:MUSIC1:FC1:NHV:V_RBV`.
+
+Update clients from `FC1:HV_V_RBV` to `FC1:NHV:V_RBV` and from
+`FC1:HV_STATE` to `FC1:NHV:STATUS`. Old `HV_*` aliases are not provided,
+so the positive and negative IOCs can share the MUSIC prefix without collisions.
+Rebuild and restart both IOCs to load the new names. This naming change does
+not alter hardware polarity or the protocol's voltage sign convention.
+
+The deployed NDT1470 database and protocol are also kept in the build source
+under `musicNdt1470App/Db` so rebuilding retains enable and ramp controls.
+
+## Operating configuration (2026-11-16)
+
+The operator confirmed that all hardware channels are set to negative polarity.
+`NHV` and `NEGATIVE` names describe this configuration; the IOC does not switch
+or verify hardware polarity. Voltage commands retain the positive-magnitude
+convention, with an EPICS range of 0 to 4500 V. This software limit does not
+program the module's hardware `MAXV`.
+
+At every IOC startup, each configured channel receives ramp-up **400 V/s** and
+ramp-down **500 V/s**, followed by a query of the accepted value. Ramp records
+use `PINI=YES` and have no protocol `@init` read that could replace these defaults
+with old hardware settings. Voltage and current setpoints retain their hardware
+initialization reads, and output enable is not processed at boot.
+The EPICS current-setpoint maximum is 80 µA. This does not automatically
+change the hardware ISET value read at startup. FHF1 uses CH0–CH2 and FMF1 uses CH0–CH1;
+unconfigured channels receive no commands.
+
+After building and restarting the IOC, verify values and alarms (replace FHF1
+with FMF1 and use field cages 1–2 for that installation):
+
+```bash
+for fc in 1 2 3; do
+  for ramp in RAMP_UP_SET RAMP_DOWN_SET; do
+    pv="SFRS:FHF1:MUSIC1:FC${fc}:NHV:${ramp}"
+    caget "$pv" "$pv.STAT" "$pv.SEVR"
+  done
+  caget "SFRS:FHF1:MUSIC1:FC${fc}:NHV:V_SET.DRVH"
+done
+```
+
+Expected ramp values are 400 and 500 with no alarms, and `DRVH` is 4500.
+A displayed default alone does not prove that the hardware accepted the write:
+check the alarms and module display. Existing USB disconnections or protocol
+reply errors must be resolved before hardware application can be confirmed.

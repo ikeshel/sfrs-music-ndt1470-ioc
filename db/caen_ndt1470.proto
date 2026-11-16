@@ -91,10 +91,7 @@ setRampUp {
     out 0x24 "BD:\$1,CMD:MON,CH:\$2,PAR:RUP";
     in "#BD:\$1,CMD:OK,VAL:%f\r\n";
 
-    @init {
-        out 0x24 "BD:\$1,CMD:MON,CH:\$2,PAR:RUP";
-        in "#BD:\$1,CMD:OK,VAL:%f\r\n";
-    }
+    # No @init read: preserve the configured VAL for the PINI startup write.
 }
 
 setRampDown {
@@ -107,8 +104,5 @@ setRampDown {
     out 0x24 "BD:\$1,CMD:MON,CH:\$2,PAR:RDW";
     in "#BD:\$1,CMD:OK,VAL:%f\r\n";
 
-    @init {
-        out 0x24 "BD:\$1,CMD:MON,CH:\$2,PAR:RDW";
-        in "#BD:\$1,CMD:OK,VAL:%f\r\n";
-    }
+    # No @init read: preserve the configured VAL for the PINI startup write.
 }

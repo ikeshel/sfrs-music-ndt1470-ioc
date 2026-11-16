@@ -1,5 +1,7 @@
 # CAEN NDT1470 ASCII protocol for StreamDevice
 #
+# i.keshelashvili@gsi.de
+#
 # Protocol arguments:
 #   \$1 = two-digit local-bus address, e.g. 00
 #   \$2 = CAEN channel number, 0..3
@@ -10,6 +12,15 @@ ReadTimeout = 2000;
 WriteTimeout = 2000;
 LockTimeout = 5000;
 ExtraInput = Ignore;
+
+
+setEnable {
+    InTerminator = "";
+    ReadTimeout = 100;
+
+    out 0x24 "BD:\$1,CMD:SET,CH:\$2,PAR:%{OFF|ON}";
+    in "#BD:\$1,CMD:OK\n\r";
+}
 
 getVMon {
     out 0x24 "BD:\$1,CMD:MON,CH:\$2,PAR:VMON";
@@ -22,14 +33,20 @@ getVSet {
 }
 
 setVSet {
+    # This NDT1470 firmware terminates SET acknowledgements with LF CR,
+    # while MON replies use CR LF.
+    InTerminator = "";
+    ReadTimeout = 100;
+
     out 0x24 "BD:\$1,CMD:SET,CH:\$2,PAR:VSET,VAL:%.1f";
-    in  "#BD:\$1,CMD:OK";
+    in  "#BD:\$1,CMD:OK\n\r";
+
     out 0x24 "BD:\$1,CMD:MON,CH:\$2,PAR:VSET";
-    in  "#BD:\$1,CMD:OK,VAL:%f";
+    in  "#BD:\$1,CMD:OK,VAL:%f\r\n";
 
     @init {
         out 0x24 "BD:\$1,CMD:MON,CH:\$2,PAR:VSET";
-        in  "#BD:\$1,CMD:OK,VAL:%f";
+        in  "#BD:\$1,CMD:OK,VAL:%f\r\n";
     }
 }
 
@@ -39,14 +56,18 @@ getISet {
 }
 
 setISet {
+    InTerminator = "";
+    ReadTimeout = 100;
+
     out 0x24 "BD:\$1,CMD:SET,CH:\$2,PAR:ISET,VAL:%.2f";
-    in  "#BD:\$1,CMD:OK";
+    in  "#BD:\$1,CMD:OK\n\r";
+
     out 0x24 "BD:\$1,CMD:MON,CH:\$2,PAR:ISET";
-    in  "#BD:\$1,CMD:OK,VAL:%f";
+    in  "#BD:\$1,CMD:OK,VAL:%f\r\n";
 
     @init {
         out 0x24 "BD:\$1,CMD:MON,CH:\$2,PAR:ISET";
-        in  "#BD:\$1,CMD:OK,VAL:%f";
+        in  "#BD:\$1,CMD:OK,VAL:%f\r\n";
     }
 }
 
@@ -58,4 +79,30 @@ getIMon {
 getStatus {
     out 0x24 "BD:\$1,CMD:MON,CH:\$2,PAR:STAT";
     in  "#BD:\$1,CMD:OK,VAL:%d";
+}
+
+setRampUp {
+    InTerminator = "";
+    ReadTimeout = 100;
+
+    out 0x24 "BD:\$1,CMD:SET,CH:\$2,PAR:RUP,VAL:%.0f";
+    in "#BD:\$1,CMD:OK\n\r";
+
+    out 0x24 "BD:\$1,CMD:MON,CH:\$2,PAR:RUP";
+    in "#BD:\$1,CMD:OK,VAL:%f\r\n";
+
+    # No @init read: preserve the configured VAL for the PINI startup write.
+}
+
+setRampDown {
+    InTerminator = "";
+    ReadTimeout = 100;
+
+    out 0x24 "BD:\$1,CMD:SET,CH:\$2,PAR:RDW,VAL:%.0f";
+    in "#BD:\$1,CMD:OK\n\r";
+
+    out 0x24 "BD:\$1,CMD:MON,CH:\$2,PAR:RDW";
+    in "#BD:\$1,CMD:OK,VAL:%f\r\n";
+
+    # No @init read: preserve the configured VAL for the PINI startup write.
 }

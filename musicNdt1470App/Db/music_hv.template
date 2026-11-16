@@ -1,5 +1,7 @@
 # Monitoring and setpoint control for one MUSIC field cage.
 #
+# i.keshelashvili@gsi.de
+#
 # P      EPICS prefix, e.g. SFRS:FHF1:MUSIC1:
 # FC     field-cage number, 1..3
 # PORT   asyn port name
@@ -8,7 +10,28 @@
 # VMAX   maximum voltage accepted through EPICS, volts
 # IMAX   maximum current limit accepted through EPICS, microamperes
 
-record(ao, "$(P)FC$(FC):HV_V_SET")
+record(bo, "$(P)FC$(FC):NHV:ENABLE")
+{
+    field(DESC, "HV output enable")
+    field(DTYP, "stream")
+    field(OUT,  "@caen_ndt1470.proto setEnable($(BD),$(CH)) $(PORT)")
+
+    field(ZNAM, "OFF")
+    field(ONAM, "ON")
+
+    # Never automatically energize HV when the IOC starts.
+    field(PINI, "NO")
+}
+
+record(longin, "$(P)FC$(FC):NHV:STATUS")
+{
+    field(DESC, "Raw CAEN status bitmask")
+    field(DTYP, "stream")
+    field(INP,  "@caen_ndt1470.proto getStatus($(BD),$(CH)) $(PORT)")
+    field(SCAN, "1 second")
+}
+
+record(ao, "$(P)FC$(FC):NHV:V_SET")
 {
     field(DESC, "HV voltage setpoint")
     field(DTYP, "stream")
@@ -23,7 +46,7 @@ record(ao, "$(P)FC$(FC):HV_V_SET")
     field(PINI, "NO")
 }
 
-record(ai, "$(P)FC$(FC):HV_V_RBV")
+record(ai, "$(P)FC$(FC):NHV:V_RBV")
 {
     field(DESC, "Measured HV voltage")
     field(DTYP, "stream")
@@ -31,11 +54,15 @@ record(ai, "$(P)FC$(FC):HV_V_RBV")
     field(SCAN, "1 second")
     field(EGU,  "V")
     field(PREC, "1")
-    field(HOPR, "8100")
-    field(LOPR, "-8100")
+    field(HOPR, "$(VMAX)")
+    field(LOPR, "-1")
+    field(LOW,  "0")
+    field(LOLO,  "0")
+    field(HIGH, "4250")
+    field(HIHI, "$(VMAX)")
 }
 
-record(ao, "$(P)FC$(FC):HV_I_SET")
+record(ao, "$(P)FC$(FC):NHV:I_SET")
 {
     field(DESC, "HV current-limit setpoint")
     field(DTYP, "stream")
@@ -50,7 +77,7 @@ record(ao, "$(P)FC$(FC):HV_I_SET")
     field(PINI, "NO")
 }
 
-record(ai, "$(P)FC$(FC):HV_I_RBV")
+record(ai, "$(P)FC$(FC):NHV:I_RBV")
 {
     field(DESC, "Measured HV current")
     field(DTYP, "stream")
@@ -58,14 +85,54 @@ record(ai, "$(P)FC$(FC):HV_I_RBV")
     field(SCAN, "1 second")
     field(EGU,  "uA")
     field(PREC, "3")
-    field(HOPR, "3000")
-    field(LOPR, "0")
+    field(HOPR, "$(IMAX)")
+    field(LOPR, "-1")
+    field(LOW,  "0")
+    field(LOLO,  "0")
+    field(HIGH, "80")
+    field(HIHI, "$(IMAX)")
 }
 
-record(longin, "$(P)FC$(FC):HV_STATE")
+record(ao, "$(P)FC$(FC):NHV:RAMP_UP_SET")
 {
-    field(DESC, "Raw CAEN status bitmask")
+    field(DESC, "HV ramp-up speed")
     field(DTYP, "stream")
-    field(INP,  "@caen_ndt1470.proto getStatus($(BD),$(CH)) $(PORT)")
-    field(SCAN, "1 second")
+    field(OUT,  "@caen_ndt1470.proto setRampUp($(BD),$(CH)) $(PORT)")
+
+    field(EGU,  "V/s")
+    field(PREC, "0")
+    field(DRVL, "1")
+    field(DRVH, "500")
+    field(LOPR, "1")
+    field(HOPR, "500")
+
+    field(VAL,  "$(RUP_DEFAULT=400)")
+    field(PINI, "YES")
 }
+
+record(ao, "$(P)FC$(FC):NHV:RAMP_DOWN_SET")
+{
+    field(DESC, "HV ramp-down speed")
+    field(DTYP, "stream")
+    field(OUT,  "@caen_ndt1470.proto setRampDown($(BD),$(CH)) $(PORT)")
+
+    field(EGU,  "V/s")
+    field(PREC, "0")
+    field(DRVL, "1")
+    field(DRVH, "500")
+    field(LOPR, "1")
+    field(HOPR, "500")
+
+    field(VAL,  "$(RDW_DEFAULT=500)")
+    field(PINI, "YES")
+}
+
+# Readable polarity aliases; each name refers to the same EPICS record.
+alias("$(P)FC$(FC):NHV:ENABLE", "$(P)FC$(FC):NEGATIVE:ENABLE")
+alias("$(P)FC$(FC):NHV:STATUS", "$(P)FC$(FC):NEGATIVE:STATUS")
+alias("$(P)FC$(FC):NHV:V_SET", "$(P)FC$(FC):NEGATIVE:V_SET")
+alias("$(P)FC$(FC):NHV:V_RBV", "$(P)FC$(FC):NEGATIVE:V_RBV")
+alias("$(P)FC$(FC):NHV:I_SET", "$(P)FC$(FC):NEGATIVE:I_SET")
+alias("$(P)FC$(FC):NHV:I_RBV", "$(P)FC$(FC):NEGATIVE:I_RBV")
+alias("$(P)FC$(FC):NHV:RAMP_UP_SET", "$(P)FC$(FC):NEGATIVE:RAMP_UP_SET")
+alias("$(P)FC$(FC):NHV:RAMP_DOWN_SET", "$(P)FC$(FC):NEGATIVE:RAMP_DOWN_SET")
